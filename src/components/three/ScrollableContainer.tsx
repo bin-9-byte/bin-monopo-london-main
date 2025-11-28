@@ -2,6 +2,7 @@ import React, { VFC, useState, useEffect, useRef, useCallback } from 'react';
 import { css } from '@emotion/css';
 import { BackgroundEffect, TextEffect } from './TCanvas';
 import { HoverContext } from './Background';
+import { PageOneOverlay } from './PageOneOverlay';
 
 export const ScrollableContainer: VFC = () => {
 	const [scrollProgress, setScrollProgress] = useState(0);
@@ -16,14 +17,14 @@ export const ScrollableContainer: VFC = () => {
 				if (!hasScrolled) {
 					setHasScrolled(true);
 				}
-				
+
 				const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 				const progress = Math.min(scrollTop / (scrollHeight - clientHeight), 1);
 				setScrollProgress(progress);
-				
+
 				tickingRef.current = false;
 			});
-			
+
 			tickingRef.current = true;
 		}
 	}, [hasScrolled]);
@@ -41,49 +42,141 @@ export const ScrollableContainer: VFC = () => {
 			<div className={styles.backgroundLayer}>
 				<BackgroundEffect />
 			</div>
-			
+
 			{/* 滚动容器层：透明，包含第一页的3D文字特效和后续内容 */}
 			<div className={styles.scrollContainer}>
-				{/* 第一页：3D文字特效 */}
+				{/* 第一页：3D文字特效 + 导航覆盖层 */}
 				<div className={styles.firstPage}>
+					<PageOneOverlay />
 					<TextEffect scrollProgress={hasScrolled ? scrollProgress : 0} />
 				</div>
-				
-				{/* 第二页及以后：常规内容 */}
-				<div className={styles.content}>
-					<div className={styles.contentInner}>
-						{/* 第二页内容 - 图片占位符 */}
-				<div className={styles.imagePlaceholder}
-					onMouseEnter={() => setHovering(true)}
-					onMouseLeave={() => setHovering(false)}>
-					第二页内容占位符
+
+				{/* 第二页：Recent Work */}
+				<div className={styles.page}>
+					<div className={styles.pageContainer}>
+						{/* 右上角控制按钮 */}
+						<div className={styles.controlButton}>
+							<span>||</span>
+						</div>
+
+						{/* 左侧文字区域 */}
+						<div className={styles.textArea}>
+							<p className={styles.sectionLabel}>RECENT WORK</p>
+							<h1 className={styles.mainTitle}>
+								NKORA COFFEE · BRAND<br />
+								/DENT/TY
+							</h1>
+							<p className={styles.subTitle}>BRAND DESIGN</p>
+						</div>
+
+						{/* 中央项目展示图 */}
+						<div
+							className={styles.projectImage}
+							onMouseEnter={() => setHovering(true)}
+							onMouseLeave={() => setHovering(false)}
+						>
+							{/* 这里将放置实际的项目图片 */}
+							<div className={styles.imagePlaceholder}>
+								NKORA COFFEE PROJECT IMAGE
+							</div>
+						</div>
+
+						{/* 底部按钮 */}
+						<button className={styles.discoverButton}>
+							DISCOVER ALL PROJECTS →
+						</button>
+					</div>
 				</div>
-						
-						<h1>Welcome to Our Creative Space</h1>
-						<p>This is where the magic happens. As you scroll, the 3D text effect fades away and new content emerges.</p>
-						<div className={styles.card}>
-							<h2>About Our Work</h2>
-							<p>We create immersive digital experiences that blend art and technology. Our team specializes in interactive web design, 3D visualizations, and creative coding.</p>
+
+				{/* 第三页：Contact Page */}
+				<div className={styles.page}>
+					<div className={styles.contactContainer}>
+						{/* 左上角 Logo */}
+						<div className={styles.logo}>
+							<div className={styles.logoCircle}>D/B</div>
 						</div>
-						<div className={styles.card}>
-							<h2>Our Process</h2>
-							<p>Every project begins with a vision. We transform ideas into reality through careful planning, innovative design, and precise implementation.</p>
+
+						{/* 右上角控制按钮 */}
+						<div className={styles.controlButton}>
+							<span>||</span>
 						</div>
-						<div className={styles.card}>
-							<h2>Get In Touch</h2>
-							<p>Have a project in mind? We'd love to hear from you. Let's create something amazing together.</p>
+
+						{/* 主要内容区域 */}
+						<div className={styles.contactContent}>
+							{/* 左侧：主标题和邮箱 */}
+							<div className={styles.contactLeft}>
+								<h1 className={styles.contactTitle}>
+									WE WOULD LOVE<br />
+									TO HEAR FROM YOU.
+								</h1>
+								<p className={styles.contactSubtext}>
+									Feel free to reach out if you<br />
+									want to collaborate with us, or<br />
+									simply have a chat.
+								</p>
+								<a href="mailto:contact@monopo.london" className={styles.emailLink}>
+									contact@monopo.london →
+								</a>
+							</div>
+
+							{/* 中央：地址和社交链接 */}
+							<div className={styles.contactMiddle}>
+								<div className={styles.infoSection}>
+									<h3>OUR ADDRESS</h3>
+									<p>
+										Unit D104<br />
+										116 Commercial Street<br />
+										London, E1 6NF<br />
+										United Kingdom
+									</p>
+									<p className={styles.vatInfo}>
+										VAT: 319656475<br />
+										Company no.<br />
+										11843590<br />
+										Registered in<br />
+										England & Wales
+									</p>
+								</div>
+
+								<div className={styles.infoSection}>
+									<h3>FOLLOW US</h3>
+									<div className={styles.socialLinks}>
+										<a href="#">Fb</a>
+										<a href="#">Tw</a>
+										<a href="#">Ig</a>
+										<a href="#">Li</a>
+									</div>
+								</div>
+
+								<div className={styles.infoSection}>
+									<a href="#" className={styles.siteLink}>→ MONOPO TKY</a>
+									<a href="#" className={styles.siteLink}>→ MONOPO NYC</a>
+									<a href="#" className={styles.siteLink}>→ POWERED BY TOKYO</a>
+								</div>
+							</div>
+
+							{/* 右侧：导航菜单 */}
+							<div className={styles.contactRight}>
+								<nav className={styles.navMenu}>
+									<a href="#" className={styles.navItem}>▸ HOME</a>
+									<a href="#" className={styles.navItem}>WORK</a>
+									<a href="#" className={styles.navItem}>SERVICES</a>
+									<a href="#" className={styles.navItem}>TEAM</a>
+									<a href="#" className={styles.navItem}>CONTACT</a>
+									<a href="#" className={styles.navItem}>PRESS & NEWS</a>
+									<a href="#" className={styles.navItem}>PRIVACY POLICY</a>
+								</nav>
+							</div>
 						</div>
-						<div className={styles.card}>
-							<h2>Our Technologies</h2>
-							<p>We leverage cutting-edge technologies including React Three Fiber, WebGL, and advanced shader programming to create stunning visual experiences that push the boundaries of what's possible on the web.</p>
-						</div>
-						<div className={styles.card}>
-							<h2>Recent Projects</h2>
-							<p>Our portfolio includes interactive installations, data visualizations, brand experiences, and experimental web art. Each project is an opportunity to explore new creative territories.</p>
-						</div>
-						<div className={styles.card}>
-							<h2>Join Our Team</h2>
-							<p>We're always looking for talented individuals who share our passion for blending technology and creativity. If you're a developer, designer, or creative technologist, we'd love to connect.</p>
+
+						{/* 底部 */}
+						<div className={styles.contactFooter}>
+							<p className={styles.copyright}>
+								© MONOPO LONDON LTD 2024 All rights reserved
+							</p>
+							<button className={styles.topButton}>
+								TOP ↑
+							</button>
 						</div>
 					</div>
 				</div>
@@ -119,68 +212,291 @@ const styles = {
 		width: 100%;
 		height: 100vh;
 	`,
-	content: css`
+	page: css`
 		position: relative;
-		background-color: transparent;
+		width: 100%;
 		min-height: 100vh;
-		padding-bottom: 50px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 80px 0;
 	`,
-	contentInner: css`
-		max-width: 800px;
-		margin: 0 auto;
-		padding: 80px 20px;
-		color: #333333;
+	pageContainer: css`
+		position: relative;
+		width: 100%;
+		max-width: 90vw;
+		padding: 0 60px;
+	`,
+	controlButton: css`
+		position: absolute;
+		top: 40px;
+		right: 60px;
+		width: 60px;
+		height: 60px;
+		border-radius: 50%;
+		background-color: rgba(255, 255, 255, 0.9);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		z-index: 10;
 		
-		h1 {
-			font-size: 3rem;
-			margin-bottom: 2rem;
+		span {
+			font-size: 1.2rem;
 			font-weight: bold;
+			color: #333;
 		}
 		
-		p {
-			font-size: 1.2rem;
-			line-height: 1.6;
-			margin-bottom: 2rem;
+		&:hover {
+			transform: scale(1.1);
+			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+		}
+	`,
+	textArea: css`
+		margin-bottom: 60px;
+	`,
+	sectionLabel: css`
+		font-size: 0.9rem;
+		letter-spacing: 3px;
+		color: rgba(255, 255, 255, 0.8);
+		margin-bottom: 20px;
+		font-weight: 300;
+	`,
+	mainTitle: css`
+		font-size: 4rem;
+		font-weight: 300;
+		color: #ffffff;
+		line-height: 1.1;
+		margin: 0 0 20px 0;
+		letter-spacing: -1px;
+	`,
+	subTitle: css`
+		font-size: 1rem;
+		letter-spacing: 2px;
+		color: #e25a2c;
+		font-weight: 400;
+	`,
+	projectImage: css`
+		width: 100%;
+		max-width: 800px;
+		margin: 0 auto 60px auto;
+		cursor: pointer;
+		transition: transform 0.3s ease;
+		
+		&:hover {
+			transform: scale(1.02);
 		}
 	`,
 	imagePlaceholder: css`
 		width: 100%;
-		height: 60vh;
-		background-color: #ffffff;
-		margin-bottom: 3rem;
+		aspect-ratio: 16 / 9;
+		background-color: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(10px);
+		border-radius: 12px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: #333333;
-		font-size: 2rem;
-		font-weight: bold;
-		text-align: center;
-		border-radius: 8px;
-		transition: all 0.3s ease;
+		color: rgba(255, 255, 255, 0.5);
+		font-size: 1.5rem;
+		font-weight: 300;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+	`,
+	discoverButton: css`
+		display: block;
+		margin: 0 auto;
+		padding: 18px 40px;
+		background-color: transparent;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		color: #ffffff;
+		font-size: 0.9rem;
+		letter-spacing: 2px;
 		cursor: pointer;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		transition: all 0.3s ease;
+		border-radius: 30px;
+		font-weight: 300;
 		
 		&:hover {
-			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-			transform: scale(1.02);
+			background-color: rgba(255, 255, 255, 0.1);
+			border-color: rgba(255, 255, 255, 0.6);
+			transform: translateY(-2px);
 		}
 	`,
-	card: css`
-		background-color: rgba(255, 255, 255, 0.9);
-		border-radius: 8px;
-		padding: 2rem;
-		margin-bottom: 2rem;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+	// Page 3: Contact Page Styles
+	contactContainer: css`
+		position: relative;
+		width: 100%;
+		max-width: 90vw;
+		padding: 80px 60px;
+	`,
+	logo: css`
+		position: absolute;
+		top: 40px;
+		left: 60px;
+	`,
+	logoCircle: css`
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		border: 2px solid rgba(255, 255, 255, 0.6);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: rgba(255, 255, 255, 0.8);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 1px;
+	`,
+	contactContent: css`
+		display: grid;
+		grid-template-columns: 1.2fr 1fr 0.6fr;
+		gap: 80px;
+		margin-top: 60px;
+	`,
+	contactLeft: css`
+		display: flex;
+		flex-direction: column;
+		gap: 30px;
+	`,
+	contactTitle: css`
+		font-size: 3.5rem;
+		font-weight: 400;
+		color: #ffffff;
+		line-height: 1.1;
+		margin: 0;
+		letter-spacing: -1px;
+	`,
+	contactSubtext: css`
+		font-size: 1rem;
+		line-height: 1.6;
+		color: rgba(255, 255, 255, 0.6);
+		margin: 0;
+		font-weight: 300;
+	`,
+	emailLink: css`
+		font-size: 1.1rem;
+		color: #ffffff;
+		text-decoration: none;
+		font-weight: 400;
+		transition: all 0.3s ease;
+		display: inline-block;
 		
-		h2 {
-			font-size: 1.8rem;
-			margin-bottom: 1rem;
+		&:hover {
 			color: #e25a2c;
+			transform: translateX(5px);
+		}
+	`,
+	contactMiddle: css`
+		display: flex;
+		flex-direction: column;
+		gap: 50px;
+		padding-top: 20px;
+	`,
+	infoSection: css`
+		h3 {
+			font-size: 0.75rem;
+			letter-spacing: 2px;
+			color: rgba(255, 255, 255, 0.6);
+			margin: 0 0 20px 0;
+			font-weight: 400;
 		}
 		
 		p {
-			font-size: 1.1rem;
-			margin-bottom: 0;
+			font-size: 0.95rem;
+			line-height: 1.8;
+			color: rgba(255, 255, 255, 0.8);
+			margin: 0;
+			font-weight: 300;
+		}
+	`,
+	vatInfo: css`
+		margin-top: 20px !important;
+		font-size: 0.85rem !important;
+		color: rgba(255, 255, 255, 0.5) !important;
+	`,
+	socialLinks: css`
+		display: flex;
+		gap: 20px;
+		
+		a {
+			font-size: 0.95rem;
+			color: rgba(255, 255, 255, 0.8);
+			text-decoration: none;
+			transition: color 0.3s ease;
+			
+			&:hover {
+				color: #ffffff;
+			}
+		}
+	`,
+	siteLink: css`
+		display: block;
+		font-size: 0.9rem;
+		color: rgba(255, 255, 255, 0.8);
+		text-decoration: none;
+		margin-bottom: 12px;
+		transition: all 0.3s ease;
+		font-weight: 300;
+		
+		&:hover {
+			color: #ffffff;
+			transform: translateX(5px);
+		}
+	`,
+	contactRight: css`
+		padding-top: 20px;
+	`,
+	navMenu: css`
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	`,
+	navItem: css`
+		font-size: 0.9rem;
+		color: rgba(255, 255, 255, 0.7);
+		text-decoration: none;
+		transition: all 0.3s ease;
+		font-weight: 300;
+		letter-spacing: 0.5px;
+		
+		&:hover {
+			color: #ffffff;
+			transform: translateX(3px);
+		}
+	`,
+	contactFooter: css`
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-top: 120px;
+		padding-top: 40px;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+	`,
+	copyright: css`
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.4);
+		margin: 0;
+		font-weight: 300;
+	`,
+	topButton: css`
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		background-color: transparent;
+		color: rgba(255, 255, 255, 0.8);
+		font-size: 0.85rem;
+		font-weight: 400;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		letter-spacing: 1px;
+		
+		&:hover {
+			background-color: rgba(255, 255, 255, 0.1);
+			border-color: rgba(255, 255, 255, 0.6);
+			transform: translateY(-3px);
 		}
 	`
 }

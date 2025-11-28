@@ -35,9 +35,9 @@ export const TextEffect: VFC<{ scrollProgress?: number }> = ({ scrollProgress = 
 					fragmentShader={enFragmentShader}
 					scrollProgress={scrollProgress}
 				/>
-				<TextPlane 
-					text={['欢迎来到', '马斌的设计世界']} 
-					vertexShader={jpVertexShader} 
+				<TextPlane
+					text={['欢迎来到', '马斌的设计世界']}
+					vertexShader={jpVertexShader}
 					fragmentShader={jpFragmentShader}
 					scrollProgress={scrollProgress}
 				/>
@@ -61,9 +61,9 @@ export const SceneEffect: VFC<{ scrollProgress?: number }> = ({ scrollProgress =
 					fragmentShader={enFragmentShader}
 					scrollProgress={scrollProgress}
 				/>
-				<TextPlane 
-					text={['今日は', '何を作ろうか?']} 
-					vertexShader={jpVertexShader} 
+				<TextPlane
+					text={['今日は', '何を作ろうか?']}
+					vertexShader={jpVertexShader}
 					fragmentShader={jpFragmentShader}
 					scrollProgress={scrollProgress}
 				/>
