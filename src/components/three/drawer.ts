@@ -30,10 +30,16 @@ export class Drawer {
 		ctx.font = `bold ${fontSize}px 'Poppins'`
 		ctx.fillStyle = '#fff'
 
-		const text2Metrics = ctx.measureText(this._text2)
+		// 绘制顶部文字
+		if (this._text1) {
+			ctx.fillText(this._text1, this._margin, this._margin)
+		}
 
-		ctx.fillText(this._text1, this._margin, this._margin)
-		ctx.fillText(this._text2, width - text2Metrics.width - this._margin, height - (fontSize + this._margin))
+		// 绘制底部文字
+		if (this._text2) {
+			const text2Metrics = ctx.measureText(this._text2)
+			ctx.fillText(this._text2, width - text2Metrics.width - this._margin, height - (fontSize + this._margin))
+		}
 
 		// ctx.lineWidth = 3
 		// ctx.strokeStyle = '#f00'

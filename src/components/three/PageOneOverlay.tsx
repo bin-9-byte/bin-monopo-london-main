@@ -1,36 +1,54 @@
 import React, { VFC } from 'react';
 import { css } from '@emotion/css';
 
-export const PageOneOverlay: VFC = () => {
+type PageOneOverlayProps = {
+  scrollProgress?: number
+  fadeStart?: number
+  fadeEnd?: number
+}
+
+export const PageOneOverlay: VFC<PageOneOverlayProps> = ({
+  scrollProgress = 0,
+  fadeStart = 0.06,
+  fadeEnd = 0.22
+}) => {
+  const t = Math.min(Math.max((scrollProgress - fadeStart) / Math.max(1e-6, (fadeEnd - fadeStart)), 0), 1)
+  const smooth = t * t * (3 - 2 * t) // smoothstep
+  const footerOpacity = 1 - smooth
+
 	return (
 		<>
 			{/* 顶部导航栏 */}
 			<header className={styles.header}>
-				{/* Logo */}
+				{/* 左侧 Logo */}
 				<div className={styles.logo}>
 					monopo <span>|</span> london
 				</div>
 
-				{/* 导航菜单 */}
-				<nav className={styles.nav}>
-					<a href="#" className={styles.navLink}>▸ HOME</a>
-					<a href="#" className={styles.navLink}>WORK</a>
-					<a href="#" className={styles.navLink}>SERVICES</a>
-					<a href="#" className={styles.navLink}>TEAM</a>
-					<a href="#" className={styles.navLink}>CONTACT</a>
-					<a href="#" className={styles.navLink}>PRESS & NEWS</a>
-				</nav>
+				{/* 中间两列导航 */}
+				<div className={styles.navGrid}>
+					<div className={styles.navColumn}>
+						<a href="/" className={styles.navLink}><span className={styles.bullet}>▸</span> HOME</a>
+						<a href="/work" className={styles.navLink}>WORK</a>
+						<a href="/services" className={styles.navLink}>SERVICES</a>
+					</div>
+					<div className={styles.navColumn}>
+						<a href="/team" className={styles.navLink}>TEAM</a>
+						<a href="/contact" className={styles.navLink}>CONTACT</a>
+						<a href="/press-news" className={styles.navLink}>PRESS & NEWS</a>
+					</div>
+				</div>
 
-				{/* 时间显示 */}
+				{/* 右侧时间显示 */}
 				<div className={styles.timeDisplay}>
-					<div className={styles.timeItem}>▸ 03:46 AM</div>
-					<div className={styles.timeItem}>12:46 PM</div>
-					<div className={styles.timeItem}>10:46 PM</div>
+					<div className={`${styles.timeItem} ${styles.timeItemHighlight}`}><span className={styles.bullet}>▸</span> 07:54 AM</div>
+					<div className={styles.timeItem}>04:54 PM</div>
+					<div className={styles.timeItem}>02:54 AM</div>
 				</div>
 			</header>
 
 			{/* 底部信息区 */}
-			<footer className={styles.footer}>
+			<footer className={styles.footer} style={{ opacity: footerOpacity }}>
 				{/* 左下角 Logo */}
 				<div className={styles.footerLogo}>
 					<div className={styles.logoCircle}>D/B</div>
@@ -70,10 +88,10 @@ const styles = {
 		top: 0;
 		left: 0;
 		right: 0;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 40px 60px;
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: start;
+		padding: 28px 60px;
 		z-index: 100;
 		pointer-events: auto;
 	`,
@@ -88,31 +106,49 @@ const styles = {
 			opacity: 0.5;
 		}
 	`,
-	nav: css`
+	navGrid: css`
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		column-gap: 120px;
+		row-gap: 8px;
+		justify-self: center;
+	`,
+	navColumn: css`
 		display: flex;
-		gap: 40px;
+		flex-direction: column;
+		gap: 10px;
 	`,
 	navLink: css`
-		font-size: 0.85rem;
-		font-weight: 300;
-		color: rgba(255, 255, 255, 0.8);
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: rgba(255, 255, 255, 0.9);
 		text-decoration: none;
-		letter-spacing: 1px;
-		transition: color 0.3s ease;
+		letter-spacing: 1.2px;
+		text-transform: uppercase;
+		transition: color 0.2s ease;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
 		
-		&:hover {
-			color: #ffffff;
-		}
+		&:hover { color: #ffffff; }
+	`,
+	bullet: css`
+		color: rgba(255, 255, 255, 0.9);
 	`,
 	timeDisplay: css`
 		display: flex;
-		gap: 30px;
+		flex-direction: column;
+		gap: 10px;
 	`,
 	timeItem: css`
-		font-size: 0.85rem;
-		font-weight: 300;
-		color: rgba(255, 255, 255, 0.7);
-		letter-spacing: 0.5px;
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: rgba(255, 255, 255, 0.85);
+		letter-spacing: 1.2px;
+		text-transform: uppercase;
+	`,
+	timeItemHighlight: css`
+		color: rgba(255, 255, 255, 0.95);
 	`,
 	footer: css`
 		position: absolute;

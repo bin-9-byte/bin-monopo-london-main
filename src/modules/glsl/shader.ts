@@ -13,6 +13,8 @@ uniform vec2 u_mouse;
 uniform float u_aspect;
 uniform bool u_enable;
 uniform float u_scrollProgress;
+uniform float u_fadeStart;
+uniform float u_fadeEnd;
 varying vec2 v_uv;
 
 void main() {
@@ -23,21 +25,15 @@ void main() {
   float dist = distance(u_mouse * aspect, v_uv * aspect);
   float d = 1.0 - smoothstep(radius, radius + 0.005, dist);
   
-  // 滚动效果：文字向两侧淡出
-  float scrollFade = 0.0;
-  if (u_scrollProgress > 0.0) {
-    // 计算距离中心点的距离
-    float centerDist = abs(v_uv.x - 0.5);
-    // 根据滚动进度和距离中心点的距离计算淡出效果
-    scrollFade = smoothstep(0.0, 0.5, centerDist) * u_scrollProgress;
-  }
+  // 滚动效果：全局淡出（位置不动）
+  float fadeAlpha = 1.0 - smoothstep(u_fadeStart, u_fadeEnd, u_scrollProgress);
   
   if (u_enable) {
     tex.a = mix(tex.a, 0.0, d);
   }
   
-  // 应用滚动淡出效果
-  tex.a = mix(tex.a, 0.0, scrollFade);
+  // 应用滚动淡出效果（全局淡出）
+  tex.a *= fadeAlpha;
 
   gl_FragColor = tex;
 }
@@ -59,6 +55,8 @@ uniform vec2 u_mouse;
 uniform float u_aspect;
 uniform bool u_enable;
 uniform float u_scrollProgress;
+uniform float u_fadeStart;
+uniform float u_fadeEnd;
 varying vec2 v_uv;
 
 void main() {
@@ -77,23 +75,15 @@ void main() {
   float a = max(max(tex_r.a, tex_g.a), tex_b.a);
   vec4 tex = vec4(tex_r.r, tex_g.g, tex_b.b, a);
 
-  tex.a = mix(tex.a, 0.0, d);
-  
-  // 滚动效果：文字向两侧淡出
-  float scrollFade = 0.0;
-  if (u_scrollProgress > 0.0) {
-    // 计算距离中心点的距离
-    float centerDist = abs(v_uv.x - 0.5);
-    // 根据滚动进度和距离中心点的距离计算淡出效果
-    scrollFade = smoothstep(0.0, 0.5, centerDist) * u_scrollProgress;
+  if (u_enable) {
+    tex.a = mix(tex.a, 0.0, d);
   }
   
-  // 应用滚动淡出效果
-  tex.a = mix(tex.a, 0.0, scrollFade);
+  // 滚动效果：全局淡出（位置不动）
+  float fadeAlpha = 1.0 - smoothstep(u_fadeStart, u_fadeEnd, u_scrollProgress);
+  tex.a *= fadeAlpha;
   
-  if (!u_enable) {
-    tex.a = 0.0;
-  }
+  // 保持在未启用鼠标效果时仍显示文字
 
   gl_FragColor = tex;
 }

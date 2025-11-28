@@ -1,40 +1,36 @@
-import React, { VFC, useState, useEffect, useRef, useCallback } from 'react';
+import React, { VFC, useState, useRef, useEffect } from 'react';
 import { css } from '@emotion/css';
-import { BackgroundEffect, TextEffect } from './TCanvas';
+import { BackgroundEffect } from './TCanvas';
+import { AdvancedTextEffect } from './AdvancedTextEffect';
+import { ScrollController } from './ScrollController';
 import { HoverContext } from './Background';
 import { PageOneOverlay } from './PageOneOverlay';
 
 export const ScrollableContainer: VFC = () => {
-	const [scrollProgress, setScrollProgress] = useState(0);
-	const [hasScrolled, setHasScrolled] = useState(false);
-	const { setHovering } = React.useContext(HoverContext);
-	const tickingRef = useRef(false);
+    const [scrollProgress, setScrollProgress] = useState(0);
+    const [hasScrolled, setHasScrolled] = useState(false);
+    const { setHovering } = React.useContext(HoverContext);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [globalMouse, setGlobalMouse] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
-	const handleScroll = useCallback(() => {
-		if (!tickingRef.current) {
-			window.requestAnimationFrame(() => {
-				// 标记用户已经开始滚动
-				if (!hasScrolled) {
-					setHasScrolled(true);
-				}
+    const handleScrollChange = (progress: number) => {
+        // 标记用户已经开始滚动
+        if (!hasScrolled && progress > 0) {
+            setHasScrolled(true);
+        }
+        setScrollProgress(progress);
+    };
 
-				const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-				const progress = Math.min(scrollTop / (scrollHeight - clientHeight), 1);
-				setScrollProgress(progress);
-
-				tickingRef.current = false;
-			});
-
-			tickingRef.current = true;
-		}
-	}, [hasScrolled]);
-
-	useEffect(() => {
-		window.addEventListener('scroll', handleScroll, { passive: true });
-		return () => {
-			window.removeEventListener('scroll', handleScroll);
-		};
-	}, [handleScroll]);
+    // 监听全局鼠标，转换为 -1..1 归一化坐标
+    useEffect(() => {
+        const onMouseMove = (e: MouseEvent) => {
+            const x = (e.clientX / window.innerWidth) * 2 - 1;
+            const y = -(e.clientY / window.innerHeight) * 2 + 1;
+            setGlobalMouse({ x, y });
+        };
+        window.addEventListener('mousemove', onMouseMove, { passive: true });
+        return () => window.removeEventListener('mousemove', onMouseMove);
+    }, []);
 
 	return (
 		<div className={styles.container}>
@@ -43,13 +39,37 @@ export const ScrollableContainer: VFC = () => {
 				<BackgroundEffect />
 			</div>
 
+            {/* 固定的文字层：位置不随滚动移动，仅根据滚动渐隐 */}
+            <div className={styles.textLayer}>
+                <AdvancedTextEffect 
+                    scrollProgress={hasScrolled ? scrollProgress : 0} 
+                    enableMouseEffect={true}
+                    enableLense={true}
+                    globalMouse={globalMouse}
+                />
+            </div>
+
+            {/* 滚动控制器：绑定到滚动容器，取消防抖并降低阈值 */}
+            <ScrollController 
+                onScrollChange={handleScrollChange} 
+                scrollElementRef={scrollRef}
+                debounceMs={0}
+                scrollThreshold={0.0007}
+            />
+
 			{/* 滚动容器层：透明，包含第一页的3D文字特效和后续内容 */}
-			<div className={styles.scrollContainer}>
-				{/* 第一页：3D文字特效 + 导航覆盖层 */}
+            <div className={styles.scrollContainer} ref={scrollRef}>
+				{/* 第一页：导航覆盖层（文字效果已移至固定层）*/}
 				<div className={styles.firstPage}>
-					<PageOneOverlay />
-					<TextEffect scrollProgress={hasScrolled ? scrollProgress : 0} />
+                    <PageOneOverlay 
+                        scrollProgress={hasScrolled ? scrollProgress : 0}
+                        fadeStart={0.03}
+                        fadeEnd={0.16}
+                    />
 				</div>
+				
+				{/* 导航区域遮罩层：阻止鼠标事件穿透到3D文字层 */}
+				<div className={styles.navBlocker} />
 
 				{/* 第二页：Recent Work */}
 				<div className={styles.page}>
@@ -200,17 +220,36 @@ const styles = {
 		height: 100vh;
 		z-index: 1;
 	`,
+	textLayer: css`
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100vh;
+		z-index: 4;
+		pointer-events: none;
+	`,
 	scrollContainer: css`
 		position: relative;
 		width: 100%;
 		height: 100vh;
 		overflow-y: auto;
-		z-index: 2;
+		z-index: 3;
 	`,
 	firstPage: css`
 		position: relative;
 		width: 100%;
 		height: 100vh;
+	`,
+	navBlocker: css`
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 200px; /* 覆盖顶部导航区域 */
+		z-index: 15; /* 高于3D文字层，低于导航内容 */
+		pointer-events: all; /* 接收鼠标事件，阻止穿透 */
+		background: transparent;
 	`,
 	page: css`
 		position: relative;
@@ -473,6 +512,8 @@ const styles = {
 		margin-top: 120px;
 		padding-top: 40px;
 		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		pointer-events: all; /* 改为接收事件，阻止穿透到3D文字层 */
+		background: transparent;
 	`,
 	copyright: css`
 		font-size: 0.75rem;
