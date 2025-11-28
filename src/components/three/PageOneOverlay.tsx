@@ -22,7 +22,7 @@ export const PageOneOverlay: VFC<PageOneOverlayProps> = ({
 			<header className={styles.header}>
 				{/* 左侧 Logo */}
 				<div className={styles.logo}>
-					monopo <span>|</span> london
+					BIN <span>|</span> World
 				</div>
 
 				{/* 中间两列导航 */}
