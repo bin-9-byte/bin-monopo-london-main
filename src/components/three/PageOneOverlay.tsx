@@ -124,7 +124,7 @@ const styles = {
 		align-items: flex-end;
 		padding: 60px;
 		z-index: 100;
-		pointer-events: auto;
+		pointer-events: none;
 	`,
 	footerLogo: css`
 		flex-shrink: 0;
@@ -150,6 +150,7 @@ const styles = {
 		padding: 0 80px;
 	`,
 	infoColumn: css`
+		pointer-events: none;
 		h3 {
 			font-size: 1.1rem;
 			font-weight: 400;
